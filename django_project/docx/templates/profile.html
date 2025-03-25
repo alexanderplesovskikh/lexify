@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+
+{% block css %}
+
+<style>
+    /* Custom scrollbar styles */
+    html::-webkit-scrollbar {
+        width: 10px;
+        /* Width of the scrollbar */
+    }
+
+    html::-webkit-scrollbar-track {
+        background: #e0e0e0;
+        /* Track background */
+        border-radius: 5px;
+        /* Rounded corners for track */
+    }
+
+    html::-webkit-scrollbar-thumb {
+        background: #888;
+        /* Scrollbar thumb color */
+        border-radius: 5px;
+        /* Rounded corners for thumb */
+        border: 2px solid #e0e0e0;
+        /* Border to create spacing */
+    }
+
+    html::-webkit-scrollbar-thumb:hover {
+        background: #555;
+        /* Hover color for the thumb */
+    }
+
+    /* For Firefox */
+    html {
+        scrollbar-width: thin;
+        /* Thin scrollbar */
+        scrollbar-color: #888 #e0e0e0;
+        /* Thumb color and track color */
+    }
+
+    .page-content {
+        min-height: 80vh;
+    }
+
+    .mb0 {
+        margin-bottom: 0px;
+    }
+
+    .mb05 {
+        margin-top: 0.1rem;
+        margin-bottom: 0.1rem;
+    }
+
+
+    .page-title {
+        margin-bottom: 2rem;
+    }
+
+    .page-margin-top {
+        margin-top: 2rem;
+    }
+
+    .tabs-box {
+        border: 1px solid #ccc;
+        border-radius: 12px;
+        width: 100%;
+        margin-bottom: 2rem;
+    }
+
+    .tabs-header {
+
+        padding: 0.5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        border-bottom: 1px solid #ccc;
+
+    }
+
+    .tabs-content {
+
+        padding: 0.5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+
+    }
+
+    .error_badge {
+        background: #fee2e2;
+        color: #b91c1c;
+        border-radius: 12px;
+        font-size: 1.005rem;
+        padding-left: 10px;
+        padding-right: 10px;
+        margin-left: 7px;
+    }
+
+    hr {
+        margin: 0px;
+        display: none;
+    }
+
+    .new {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: #ece9e9 solid 1px;
+    }
+
+    .new:hover {
+        background-color: #f3f1f1;
+    }
+</style>
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+
+<div class="page-content">
+
+    <div class="content">
+        <div class="container">
+            <h1 id="main_page_title" class="page-title text-center page-margin-top">Профиль</h1>
+
+
+            <div class="tabs-box" id="noworks">
+                <div class="tabs-header"><i class="bi bi-check-circle"></i> Проверенные работы</div>
+                <div class="tabs-content">
+                    <h2 class="text-center"><i class="bi bi-search"></i></h2>
+                    <p class="text-center lead">У Вас еще нет проверенных документов</p>
+                    <p class="text-center"><a href="/check" class="btn btn-primary">Проверить документ <i
+                                class="bi bi-arrow-right"></i></a></p>
+                </div>
+            </div>
+
+
+            <div class="tabs-box" id="worksexist">
+                <div class="tabs-header"><i class="bi bi-check-circle"></i> Проверенные работы</div>
+                <div class="tabs-content" id="user_content_profile">
+
+
+
+
+
+
+
+
+
+                </div>
+            </div>
+
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+{% endblock %}
+
+
+{% block js %}
+
+<script>
+
+    if (!localStorage.getItem("fgtregv5gvhjy7rvnj")) {
+        window.location.href = '/login';
+    }
+
+    document.title = document.title + " | Профиль";
+
+
+
+
+
+    async function getChecked() {
+
+        let sendurl = '/get_user_docks/';
+
+        let emailUser = localStorage.getItem('fgtregv5gvhjy7rvnja');
+
+        const formData = new FormData();
+        formData.append('email', emailUser);
+
+        const response = await fetch(sendurl, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+
+            const data = await response.json();
+
+            console.log('response ok');
+
+            console.log(data['all_work_string']);
+
+            const parser = new DOMParser();
+
+            const doc = parser.parseFromString(data['all_work_string'], 'text/html');
+
+            let to_put = doc.getElementById("all_lines");
+
+            let parent_el = document.getElementById("user_content_profile");
+
+            parent_el.appendChild(to_put);
+
+            if (data['status'] == 0) {
+                let noworks = document.getElementById("noworks");
+                noworks.style.display = "block";
+                let worksexist = document.getElementById("worksexist");
+                worksexist.style.display = "none";
+            } else {
+                let noworks = document.getElementById("noworks");
+                noworks.style.display = "none";
+                let worksexist = document.getElementById("worksexist");
+                worksexist.style.display = "block";
+            }
+
+
+        } else {
+
+            console.log('response not ok');
+
+        }
+    }
+
+
+    getChecked();
+
+
+</script>
+
+
+{% endblock %}

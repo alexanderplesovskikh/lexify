@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+
+{% block css %}
+
+<style>
+
+              /* Custom scrollbar styles */
+              html::-webkit-scrollbar {
+        width: 10px; /* Width of the scrollbar */
+    }
+
+    html::-webkit-scrollbar-track {
+        background: #e0e0e0; /* Track background */
+        border-radius: 5px; /* Rounded corners for track */
+    }
+
+    html::-webkit-scrollbar-thumb {
+        background: #888; /* Scrollbar thumb color */
+        border-radius: 5px; /* Rounded corners for thumb */
+        border: 2px solid #e0e0e0; /* Border to create spacing */
+    }
+
+    html::-webkit-scrollbar-thumb:hover {
+        background: #555; /* Hover color for the thumb */
+    }
+
+    /* For Firefox */
+    html {
+        scrollbar-width:thin; /* Thin scrollbar */
+        scrollbar-color: #888 #e0e0e0; /* Thumb color and track color */
+    }
+
+body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+
+}
+.footer {
+    display: none;
+}
+
+
+
+
+
+.dynamic-iframe {
+    border: 1px solid transparent;
+    padding: 0; /* Убираем отступы */
+    margin: 0; /* Убираем маргины */
+    display: block; /* Убедитесь, что iframe отображается как блочный элемент */
+    width: 100%; /* Устанавливаем ширину в 100% */
+}
+
+
+.tabs {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            padding-top: 10px;
+            /*border-bottom: 1px solid #ccc;*/
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            background: #f0f0f0;
+        }
+        .tab.active {
+            
+            background-color: white;
+            font-weight: bold;
+        }
+        .tab-content {
+            border: 1px solid #ccc;
+            /*padding: 20px;*/
+        }
+        .add-tab {
+            cursor: pointer;
+            padding: 10px;
+            /*border: 1px solid #ccc;*/
+            background: #e0e0e0;
+            margin-left: 10px;
+        }
+</style>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+   
+
+       <!-- <h1 class="text-center pagetitle">Frame</h1>-->
+
+       <div id="calc_height">
+        <div class="container-fluid">
+
+       <ul class="tabs" id="tabList">
+        <li class="tab active" data-tab="tab1"><i class="bi bi-file-earmark"></i> 1</li>
+        <li class="add-tab" id="addTab">+</li>
+        </ul>
+        </div>
+        </div>
+
+        <div class="tab-content" id="tabContent">
+
+            <div class="content" data-content="tab1">
+        <iframe class="dynamic-iframe"
+        src="/check/">
+        </iframe>
+        </div>
+
+
+        </div>
+
+        
+
+{% endblock %}
+
+
+{% block js %}
+
+<script>
+
+document.title = document.title + " | Frame";
+
+function adjustIframeHeight () {
+
+    const navElement = document.getElementById('header_page');
+
+    // Get the height including padding and borders using getBoundingClientRect
+    const rect = navElement.getBoundingClientRect();
+    const heightWithPaddingAndBorders = rect.height;
+
+    // Get computed styles for margins
+    const style = window.getComputedStyle(navElement);
+    const marginTop = parseFloat(style.marginTop);
+    const marginBottom = parseFloat(style.marginBottom);
+
+    // Calculate total height including margins
+    const totalHeight = heightWithPaddingAndBorders + marginTop + marginBottom;
+
+    //console.log(totalHeight);
+
+    const div_calc_height = document.getElementById("calc_height");
+    const calc_height_rect = div_calc_height.getBoundingClientRect();
+    const calc_height_occupied = calc_height_rect.height;
+
+    console.log(totalHeight);
+
+    console.log(calc_height_occupied);
+
+   
+
+    const iframes = document.getElementsByClassName('dynamic-iframe');
+    for(let i = 0; i < iframes.length; i++) {
+        iframes.item(i).style.height = `${window.innerHeight - totalHeight - calc_height_occupied - 2}px`;
+    }
+};
+
+window.addEventListener('DOMContentLoaded', adjustIframeHeight);
+window.addEventListener('resize', adjustIframeHeight);
+
+
+
+//tabs
+
+ // JavaScript для управления вкладками
+ let tabCount = 1; // Счетчик вкладок
+
+function activateTab(tab) {
+    const tabs = document.querySelectorAll('.tab');
+    const contents = document.querySelectorAll('.content');
+
+    tabs.forEach(t => {
+        t.classList.remove('active');
+        if (t.dataset.tab === tab) {
+            t.classList.add('active');
+        }
+    });
+
+    contents.forEach(c => {
+        c.style.display = c.dataset.content === tab ? 'block' : 'none';
+    });
+}
+
+document.getElementById('tabList').addEventListener('click', function(e) {
+    if (e.target.classList.contains('tab')) {
+        activateTab(e.target.dataset.tab);
+    }
+});
+
+document.getElementById('addTab').addEventListener('click', function() {
+    if (tabCount < 23) {
+    tabCount++;
+    const newTab = document.createElement('li');
+    newTab.className = 'tab';
+    newTab.dataset.tab = 'tab' + tabCount;
+    newTab.innerHTML = '<i class="bi bi-file-earmark"></i> ' + tabCount;
+
+    const newContent = document.createElement('div');
+    newContent.className = 'content';
+    newContent.dataset.content = 'tab' + tabCount;
+    newContent.innerHTML = '<iframe class="dynamic-iframe" src="/check/"></iframe>';
+    newContent.style.display = 'none'; // Скрываем новое содержимое по умолчанию
+
+    document.getElementById('tabList').insertBefore(newTab, document.getElementById('addTab'));
+    document.getElementById('tabContent').appendChild(newContent);
+
+    // Активируем новую вкладку
+    activateTab(newTab.dataset.tab);
+
+    adjustIframeHeight();
+    } else {
+
+        let plus_button = document.getElementById('addTab');
+        plus_button.style.display = 'none';
+
+    }
+});
+
+// Инициализация первой вкладки
+activateTab('tab1');
+
+
+
+</script>
+
+{% endblock %}

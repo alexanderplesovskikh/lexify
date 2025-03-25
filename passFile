@@ -1,0 +1,41 @@
+Django admin
+
+Username:
+lexifyadmin
+
+Email:
+alexandermcme@gmail.com
+
+Password:
+Lexify2424@@
+
+
+
+Common commands
+sudo fuser -k 8000/tcp
+
+Cloudflare
+# Add cloudflare gpg key 
+sudo mkdir -p --mode=0755 /usr/share/keyrings 
+curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null 
+ 
+# Add this repo to your apt repositories 
+echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared jammy main' | sudo tee /etc/apt/sources.list.d/cloudflared.list 
+ 
+# install cloudflared 
+sudo apt-get update && sudo apt-get install cloudflared
+
+Tunnel
+
+cloudflared tunnel --url http://localhost:8000
+
+
+npx flowise start --PORT=5000
+
+
+python manage.py dbshell
+COPY paragraphs TO '/tmp/paragraphs.csv' WITH (FORMAT csv, HEADER);
+
+"""
+Author: Alexander Plesovskikh
+"""
