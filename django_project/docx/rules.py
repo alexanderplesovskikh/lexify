@@ -1,0 +1,289 @@
+"""
+Author: Kirill Orlov
+"""
+
+'''
+from typing import List, Tuple, Set
+from dataclasses import dataclass
+from collections import defaultdict
+
+
+@dataclass
+class ExcludedSequence:
+    text: str
+    length: int
+    state: int = 0
+
+
+@dataclass
+class ExcludedWord:
+    word: str
+    length: str
+    state: str = 0
+    pref: Tuple[str] = (' ')
+    suff: Tuple[str] = (',', '.', ' ', '!', '?', ':', ';')
+
+
+class RulesChecker:
+    def __init__(
+        self,
+        excluded_chars: str,
+        excluded_sequences: List[ExcludedSequence],
+        excluded_words: List[ExcludedWord]
+    ):
+        self.excluded_chars = excluded_chars
+        self.excluded_sequences = excluded_sequences
+        self.excluded_words = excluded_words
+
+        self.warn_chars = set()
+        self.warn_sequences = set()
+        self.warn_words = set()
+
+    @classmethod
+    def from_text_file(cls, path: str):
+        excludeds = defaultdict(list)
+        with open(path, 'r', encoding="utf-8") as file:
+            for line in file.readlines():
+                #print(line.replace('\n', '').split(' '))
+                key, val = line.replace('\n', '').split(' ')
+                excludeds[key].append(val)
+        return cls(
+            excluded_chars=''.join(excludeds.get('excluded_chars')),
+            excluded_sequences=[
+                ExcludedSequence(
+                    excluded,
+                    len(excluded)
+                )
+                for excluded in excludeds.get('excluded_sequences')
+            ],
+            excluded_words=[
+                ExcludedWord(
+                    excluded,
+                    len(excluded)
+                )
+                for excluded in excludeds.get('excluded_words')
+            ]
+        )
+
+    @property
+    def message(self):
+        base = 'В тексте допущены следующие ошибки:<br>'
+        for char in self.warn_chars:
+            base += f' - буква {char}<br>'
+        for seq in self.warn_sequences:
+            base += f' - последовательность {seq}<br>'
+        for word in self.warn_words:
+            base += f' - слово {word}<br>'
+        return base
+
+    def _clear(self):
+        self.warn_chars.clear()
+        self.warn_sequences.clear()
+        self.warn_words.clear()
+        for excluded in self.excluded_sequences:
+            excluded.state = 0
+        for excluded in self.excluded_words:
+            excluded.state = 0
+
+    def grep_text(self, text: str) -> Tuple[int, str]:
+        self._clear()
+        for ind, char in enumerate(text):
+            curr = char.lower()
+            if curr in self.excluded_chars:
+                self.warn_chars.add(curr)
+
+            for seq in self.excluded_sequences:
+                if seq.text[seq.state] == curr:
+                    seq.state += 1
+                else:
+                    seq.state = 0 if curr != seq.text[0] else 1
+
+                if seq.state == seq.length:
+                    self.warn_sequences.add(seq.text)
+                    seq.state = 0
+
+            for word in self.excluded_words:
+                if word.word[word.state] == curr:
+                    word.state += 1
+                else:
+                    word.state = 0 if curr != word.word[0] else 1
+
+                try:
+                    check_suff = text[ind + 1] in word.suff
+                except:
+                    check_suff = True
+
+                try:
+                    check_pref = text[ind - word.length] in word.pref
+                except:
+                    check_pref = True
+
+                if (
+                    word.state == word.length
+                    and check_suff
+                    and check_pref
+                ):
+                    self.warn_words.add(word.word)
+                    word.state = 0
+                elif word.state == word.length:
+                    word.state = 0
+
+        if self.warn_chars or self.warn_sequences or self.warn_words:
+            return 1, self.message
+        else:
+            return 0, 'Ошибок нет'
+'''
+
+import json
+from typing import List, Tuple, Set
+from dataclasses import dataclass
+from collections import defaultdict
+
+from pymorphy3 import MorphAnalyzer
+
+
+@dataclass
+class ExcludedSequence:
+    text: str
+    length: int = None
+    state: int = 0
+
+    def __post_init__(self):
+        self.length = len(self.text)
+
+    def process(self, ch: str):
+        if self.text[self.state] == ch:
+            self.state += 1
+        else:
+            self.state = 0 if ch != self.text[0] else 1
+
+        if self.state == self.length:
+            self.state = 0
+            return self.text
+        else:
+            return
+
+
+@dataclass
+class ExcludedWord:
+    word: str
+    pref: Tuple[str] = (' ', '(', '[', '{', '–',)
+    suff: Tuple[str] = (' ', ')', ']', '}', ',', ';', ':', '.', '!', '?',)
+    cache: str = ''
+
+    def process(self, ch: str):
+        if ch in self.pref or ch in self.suff:
+            check = self.word == self.cache
+            self.cache = ''
+            return self.word if check else None
+        self.cache += ch
+
+
+class RulesChecker:
+    SKIP_CHARS = (' ', '-', ',', '.', ':',)
+    def __init__(
+        self,
+        excluded_chars: str,
+        excluded_sequences: List[ExcludedSequence],
+        excluded_words: List[ExcludedWord]
+    ):
+        self.excluded_chars = excluded_chars
+        self.excluded_sequences = excluded_sequences
+        self.excluded_words = excluded_words
+
+        self.warn_chars = set()
+        self.warn_sequences = set()
+        self.warn_words = set()
+        self.futr_verbs = set()
+
+        self.morph = MorphAnalyzer()
+        self.track_word = ''
+
+    @classmethod
+    def from_json(cls, path: str):
+        with open(path, 'r') as file:
+            cfg_data = json.loads(file.read())
+        return cls(
+            excluded_chars=''.join([
+                x.get('val')
+                for x in cfg_data.get('excluded_chars')
+            ]),
+            excluded_sequences=[
+                ExcludedSequence(x.get('val'))
+                for x in cfg_data.get('excluded_sequences')
+            ],
+            excluded_words=[
+                ExcludedWord(x.get('val'))
+                for x in cfg_data.get('excluded_words')
+            ]
+        )
+
+    @property
+    def message(self):
+        base = 'В тексте допущены следующие ошибки:'
+        for char in self.warn_chars:
+            base += f' - символ {char};'
+        for seq in self.warn_sequences:
+            base += f' - последовательность символов {seq};'
+        for word in self.warn_words:
+            base += f' - слово {word};'
+        for word in self.futr_verbs:
+            base += f' - глагол в будущем времени {word};'
+        return base
+
+    def _clear(self):
+        self.warn_chars.clear()
+        self.warn_sequences.clear()
+        self.warn_words.clear()
+        self.futr_verbs.clear()
+        for excluded in self.excluded_sequences:
+            excluded.state = 0
+        for excluded in self.excluded_words:
+            excluded.state = 0
+
+    def _track_word(self, char: str):
+        if char in self.SKIP_CHARS and len(self.track_word) == 0:
+            return
+        if char in self.SKIP_CHARS and len(self.track_word) > 0:
+            pred = max(
+                self.morph.parse(self.track_word),
+                key=lambda x: x.score
+            )
+            is_futr_verb = (
+                'VERB' in pred.tag
+                and 'futr' in pred.tag
+            )
+            result, self.track_word = (
+                self.track_word if is_futr_verb else None,
+                ''
+            )
+            return result
+        self.track_word += char
+        return
+
+
+    def grep_text(self, text: str) -> Tuple[int, str]:
+        self._clear()
+        for ind, char in enumerate(text):
+            curr = char.lower()
+
+            if curr in self.excluded_chars:
+                self.warn_chars.add(curr)
+            for seq in self.excluded_sequences:
+                check = seq.process(curr)
+                self.warn_sequences.add(check) if check else None
+            for word in self.excluded_words:
+                check = word.process(curr)
+                self.warn_words.add(check) if check else None
+            track = self._track_word(curr)
+            self.futr_verbs.add(track) if track else None
+
+        if (
+            self.warn_chars
+            or self.warn_sequences
+            or self.warn_words
+            or self.futr_verbs
+        ):
+            return True, self.message
+        else:
+            return False, 'Ошибок нет'

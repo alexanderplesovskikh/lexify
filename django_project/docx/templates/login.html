@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+
+{% block css %}
+
+<style>
+    /* Custom scrollbar styles */
+    html::-webkit-scrollbar {
+        width: 10px;
+        /* Width of the scrollbar */
+    }
+
+    html::-webkit-scrollbar-track {
+        background: #e0e0e0;
+        /* Track background */
+        border-radius: 5px;
+        /* Rounded corners for track */
+    }
+
+    html::-webkit-scrollbar-thumb {
+        background: #888;
+        /* Scrollbar thumb color */
+        border-radius: 5px;
+        /* Rounded corners for thumb */
+        border: 2px solid #e0e0e0;
+        /* Border to create spacing */
+    }
+
+    html::-webkit-scrollbar-thumb:hover {
+        background: #555;
+        /* Hover color for the thumb */
+    }
+
+    /* For Firefox */
+    html {
+        scrollbar-width: thin;
+        /* Thin scrollbar */
+        scrollbar-color: #888 #e0e0e0;
+        /* Thumb color and track color */
+    }
+
+    .content {
+        min-height: 80vh;
+    }
+
+    .pagetitle {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .form {}
+
+    .hide {
+        display: none;
+    }
+
+    .show {
+        display: inline;
+    }
+</style>
+
+{% endblock %}
+
+
+
+{% block content %}
+<div class="content">
+    <div class="container">
+
+        <h1 class="text-center pagetitle">Получить доступ</h1>
+
+        <div class="form">
+            <div id="login_form">
+
+                <div class="row justify-content-center">
+
+                    <div class="col-md-5">
+
+                        <h1 class="text-center display-2"><i class="bi bi-person-circle"></i></h1>
+
+                        <div id="message_box" class="hide">
+                            <div class="alert alert-danger">
+                                <p class="pInAlert mb0 text-center">error</p>
+                            </div>
+                        </div>
+
+
+
+                        <div class="form-floating mb-3">
+                            <input autocomplete="email" type="email" required class="form-control" name="username"
+                                id="floatingEmail" placeholder="name@example.ru">
+                            <label for="floatingEmail">Email</label>
+                        </div>
+
+                        <div id="pass_box" class="hide">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name="password" id="floatingPassword"
+                                    placeholder="123456">
+                                <label for="floatingPassword">Код</label>
+                            </div>
+                        </div>
+
+                        <div class="control" id="button_login">
+                            <p class="text-center mb0">
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-lg btn-primary" id="login">Далее
+                                    <div id="spinner_box" class="hide">
+                                        <div class="spinner-grow spinner-grow-sm" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                            </p>
+                        </div>
+
+
+                        <div class="control hide" id="button_verify">
+                            <p class="text-center mb0">
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-lg btn-primary" id="verify">Подтвердить код
+                                    <div id="spinner_box_verify" class="hide">
+                                        <div class="spinner-grow spinner-grow-sm" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                            </p>
+                        </div>
+
+
+                        <p class="text-center">Продолжая, Вы соглашаетесь с условиями использования и политикой в
+                            отношении файлов cookie.</p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block js %}
+
+<script>
+
+    let is_code_ver = 0;
+
+    document.title = document.title + " | Вход";
+
+    let message_box = document.getElementById("message_box");
+    let pass_box = document.getElementById("pass_box");
+    let spinner_box = document.getElementById("spinner_box");
+    let button_login = document.getElementById("button_login");
+    let button_verify = document.getElementById("button_verify");
+    let spinner_box_verify = document.getElementById("spinner_box_verify");
+
+    let login_button = document.getElementById("login");
+    let verify = document.getElementById("verify");
+
+    function logSubmit(event) {
+        event.preventDefault();
+        console.log('login init');
+        let base_url = '/send_code/';
+        let email = document.getElementById("floatingEmail").value;
+        spinner_box.className = "show";
+        send_code(base_url, email);
+    }
+
+    function verifySubmit(event) {
+        event.preventDefault();
+        console.log('login verify');
+        let base_url = '/verify_code/';
+        let email = document.getElementById("floatingEmail").value;
+        let code = document.getElementById("floatingPassword").value;
+        spinner_box_verify.className = "show";
+        verify_code(base_url, email, code);
+    }
+
+    login_button.addEventListener("click", logSubmit);
+    verify.addEventListener("click", verifySubmit);
+
+    let floatingEmail = document.getElementById("floatingEmail");
+    floatingEmail.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            if (is_code_ver == 0) {
+                document.getElementById("login").click();
+                console.log('first btn clicked');
+            }
+        }
+    });
+
+    let floatingPass = document.getElementById("floatingPassword");
+    floatingPass.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            if (is_code_ver == 1) {
+                document.getElementById("verify").click();
+                console.log('second btn clicked');
+            }
+        }
+    });
+
+    async function send_code(base_url, email) {
+        try {
+            await axios.get(base_url, {
+                params: {
+                    "email": email,
+                },
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+            })
+                .then((result) => {
+                    if (result) {
+                        if (result["request"]["status"]) {
+
+
+                            if (result['data']['status'] == 'error') {
+
+                                message_box.innerHTML = '<div class="alert alert-danger"><p class="pInAlert mb0 text-center">' + result['data']['message'] + '</p></div>';
+                                message_box.className = "show";
+                                spinner_box.className = "hide";
+
+                            }
+
+                            if (result['data']['status'] == 'ok') {
+
+                                is_code_ver = 1;
+
+
+
+                                if (result['data']['link'] == '/') {
+                                    var span_mail = '';
+                                } else {
+                                    var span_mail = '.<br><a href="' + result['data']['link'] + '" class="" target="_blank">Перейти в почту <i class="bi bi-box-arrow-up-right"></i></a>';
+                                }
+
+                                message_box.innerHTML = '<div class="alert alert-success"><p class="pInAlert mb0 text-center">' + result['data']['message'] + span_mail + '</p></div>';
+                                message_box.className = "show";
+
+                                spinner_box.className = "hide";
+                                button_login.className = "hide";
+                                pass_box.className = "show";
+                                button_verify.classList = "control show";
+
+                                floatingPass.focus();
+
+
+
+
+                            }
+
+                        }
+                    }
+                });
+        } catch (error) {
+
+            console.log(error);
+            spinner_box.className = "hide";
+            message_box.className = "show";
+            message_box.innerHTML = '<div class="alert alert-warning"><p class="pInAlert mb0 text-center">' + error + '</p></div>';
+
+        }
+    }
+
+
+    async function verify_code(base_url, email, code) {
+        try {
+            await axios.get(base_url, {
+                params: {
+                    "email": email,
+                    "code": code,
+                },
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+            })
+                .then((result) => {
+                    if (result) {
+                        if (result["request"]["status"]) {
+
+
+                            if (result['data']['status'] == 'error') {
+
+                                message_box.innerHTML = '<div class="alert alert-danger"><p class="pInAlert mb0 text-center">' + result['data']['message'] + '</p></div>';
+                                message_box.className = "show";
+                                spinner_box_verify.className = "hide";
+
+                            }
+
+                            if (result['data']['status'] == 'ok') {
+
+
+                                message_box.innerHTML = '<div class="alert alert-success"><p class="pInAlert mb0 text-center">Успешная авторизация</p></div>';
+                                message_box.className = "show";
+                                spinner_box_verify.className = "hide";
+
+                                localStorage.setItem("fgtregv5gvhjy7rvnj", result['data']['token']);
+                                localStorage.setItem("fgtregv5gvhjy7rvnja", email);
+                                window.location.href = '/check';
+
+
+
+
+
+
+
+
+                            }
+
+                        }
+                    }
+                });
+        } catch (error) {
+
+            console.log(error);
+            spinner_box_verify.className = "hide";
+            message_box.className = "show";
+            message_box.innerHTML = '<div class="alert alert-warning"><p class="pInAlert mb0 text-center">' + error + '</p></div>';
+
+        }
+    }
+
+
+</script>
+
+{% endblock %}
