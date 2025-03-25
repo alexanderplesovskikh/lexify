@@ -4,7 +4,7 @@
 
 ## Ссылка на проект
 
-[app.lexiqo.ru/](https://app.lexiqo.ru/)
+[app.lexiqo.ru](https://app.lexiqo.ru/)
 
 ## Описание
 
