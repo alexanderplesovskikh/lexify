@@ -759,7 +759,7 @@ def form_report(request):
                            <h3>Информация о документе</h3>
                            <p><strong>Название:</strong> {name_s}</p>
                            <p><strong>Автор:</strong> <a href="mailto:{email_s}" target="_blank">{email_s}</a></p>
-                           <p><strong>Размер документа:</strong> {str(np.round(int(bites_s)/1000000, 1))} МБ</p>
+                           <p><strong>Размер документа:</strong> {str(np.round(int(bites_s)/1000000*1000, 2))} КБ</p>
                            <p><strong>Число символов в тексте:</strong> {len(" ".join(all_sent_parser))}</p>
                            <p><strong>Число слов в тексте:</strong> {len((" ".join(all_sent_parser)).split(" "))}</p>
                            <p><strong>Число предложений в тексте:</strong> {len(all_sent_parser)}</p>
