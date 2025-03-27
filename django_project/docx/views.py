@@ -737,15 +737,14 @@ def form_report(request):
             percent_rule = 0
 
         # Convert HTML string to PDF
-        pdfkit.from_string(f'''
-                           <!DOCTYPE html>
+        pdfkit.from_string(f'''<!DOCTYPE html>
                             <html lang="ru">
                             <head>
                                 <meta charset="UTF-8">
                            <style> 
                            
-                           ''' + ".err_in {text-decoration: underline dotted red; font-family: 'Trebuchet MS', sans-serif; color: red; font-size: 12pt;}" + ".alert{ text-decoration: underline dotted red; font-family: 'Trebuchet MS', sans-serif; color: red; font-size: 12pt; }" + f'''
-
+                           ''' + """@media print { .pagebreak { page-break-before: always; } } .err_in {text-decoration: underline dotted red; font-family: 'Trebuchet MS', sans-serif; color: red; font-size: 12pt;}" + ".alert{ text-decoration: underline dotted red; font-family: 'Trebuchet MS', sans-serif; color: red; font-size: 12pt; } h2,h3 { color:#355d8f } h2,hr{margin:2rem 0}body{margin:0;padding:0;font-family:'Trebuchet MS','Helvetica Neue',Helvetica,sans-serif;line-height:1.6;color:#333}ol,ol>ul,ul{padding-left:2rem}h2{text-align:center;font-size:18pt}h3{margin:1.5rem 0;font-size:16pt;border-bottom:2px solid #e0e0e0;padding-bottom:.5rem}.alert,.err_in,li,p{font-size:12pt}p{margin:.8rem 0}strong{color:#2c3e50}a{color:#355d8f;text-decoration:none;transition:.3s}a:hover{text-decoration:underline}ol,ul{margin:1rem 0}li{margin:.5rem 0}ul ul{margin-top:.5rem;margin-bottom:.5rem}ol>ul{list-style:none;margin:1rem 0}ol>ul li::before{content:"—";color:#355d8f;display:inline-block;width:1.5em;margin-left:-1.5em;font-weight:900;font-size:1.1em;position:relative;top:-.1em}ol>ul li p{margin-left:.5rem;display:inline-block}hr{border:0;border-top:1px solid #ddd}.alert,.err_in{text-decoration:underline dotted red;font-family:'Trebuchet MS',sans-serif;color:red}""" + f'''
+                           
                            </style>
                            </head>
                             <body>
@@ -781,6 +780,7 @@ def form_report(request):
                            <br>
                            <hr>
                            <br>
+                           <div class="pagebreak"> </div>
                            <h3>Текст документа</h3>
                            <br><div>{modified_html}</div><br>
                            <br>
