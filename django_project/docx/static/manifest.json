@@ -9,7 +9,7 @@
     "description": "Check documents for free",
     "icons": [
     {
-      "src": "fav.png",
+      "src": "images/fav.png",
       "sizes": "512x512",
       "type": "image/png"
     }
