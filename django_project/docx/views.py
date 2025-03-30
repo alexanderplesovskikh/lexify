@@ -505,7 +505,7 @@ def stream2(html_file, is_ml, biblio_style_get):
                 #model2res = model.predict_sentence(text)
             
 
-                if llm_score > 85:
+                if llm_score > 95:
                     
                     found = found_all[text_id][0]
 
