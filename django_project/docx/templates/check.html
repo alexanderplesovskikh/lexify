@@ -1312,7 +1312,7 @@ toasts-->
         let multiIndents = [];
         let multiLines = [];
 
-        async function checkStyleMapChildren(parentElement) {
+        function checkStyleMapChildren(parentElement) {
             const children = parentElement.querySelectorAll("*");
 
             for (let child of children) {
@@ -1359,13 +1359,56 @@ toasts-->
                 }
 
                 //text-indent 1.25 sm
-                if (element.getAttribute('style') !== null && element.getAttribute('style').includes('text-indent:') && !['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(element.tagName.toLowerCase())) {
+
+                if(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(element.tagName.toLowerCase())) {
+                    //headline
+                } else {
+                    //not headline
+                    let text_indent = (window.getComputedStyle(element).textIndent).replace("px", "").trim();
+                    let text_align = window.getComputedStyle(element).textAlign;
+                    console.log(text_indent);
+                    console.log(text_align);
+
+                    if (text_align == 'center') {
+                        //center
+
+                        if(text_indent !== "0") {
+                            addCheckedStyles(element.id, `Текст, имеющий выравнивания по середине, не может иметь абзацный отступ, отличный от нуля. Текущее значение абзацного отступа: ${(parseFloat(text_indent)*0.0264583333).toFixed(2).toString().replace(".", ",")} см.`);
+                        }
+
+
+                    } else {
+                        //not center
+
+                        //47.04 or 48
+
+                        if((element.getAttribute('style') && element.getAttribute('style').includes('text-align:') && parseFloat(text_indent) < 46) 
+                        || (element.getAttribute('style') && element.getAttribute('style').includes('text-align:') && parseFloat(text_indent) > 49) 
+                    
+                    ) {
+                            addCheckedStyles(element.id, `Текст, не имеющий выравнивания по середине и не являющийся заголовком, должен иметь абзацный отступ, равный 1,25 / 1,27 см. Текущее значение абзацного отступа: ${(parseFloat(text_indent)*0.0264583333).toFixed(2).toString().replace(".", ",")} см.`);
+                        }
+                    }
+
+                }
+
+
+       /*         if (element.getAttribute('style') !== null && element.getAttribute('style').includes('text-indent:') && !['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(element.tagName.toLowerCase())) {
                     if (!element.getAttribute('style').includes('text-indent: 0.49in') && !element.getAttribute('style').includes('text-indent: 0.5in')) {
                         addCheckedStyles(element.id, `Абзац должен начинаться отступом, равным 1,25 / 1,27 см. Текущее значение абзацного отступа: ${(parseFloat(element.getAttribute('style').match(/text-indent:\s*([^in]+)/)[1].trim()) * 2.54).toString().replaceAll(".", ",")} см`);
 
+                        console.log("indent", window.getComputedStyle(element).textIndent);
+
                         let exists_indent = multiIndents.includes((parseFloat(element.getAttribute('style').match(/text-indent:\s*([^in]+)/)[1].trim()) * 2.54).toString().replaceAll(".", ","));
                         if (!exists_indent) {
+
+                            if (element.getAttribute('style').match(/text-indent:\s*([^in]+)/)[1].trim() == '0') {
+                            
+                            } else {
+
                             multiIndents.push((parseFloat(element.getAttribute('style').match(/text-indent:\s*([^in]+)/)[1].trim()) * 2.54).toString().replaceAll(".", ","));
+
+                            }
 
                             if (multiIndents.length > 1) {
                                 addCheckedStyles(element.id, `Не используйте различные абзацные отступы в пределах одного документа. Вы уже используете: ${multiIndents.join("; ")}`);
@@ -1373,7 +1416,7 @@ toasts-->
 
                         }
                     }
-                }
+                } */
 
 
                 //font-size
@@ -1392,29 +1435,28 @@ toasts-->
 
 
                 //background
-                if (element.getAttribute('style') !== null && element.getAttribute('style').includes('background:')) {
+                if (element.getAttribute('style') !== null && element.getAttribute('style').includes('background:') && !element.getAttribute('style').includes('background: transparent')) {
                     addCheckedStyles(element.id, `Не используйте фоновую заливку текста в документе`);
                 }
 
 
                 //text-indent and center prohibition
-                if (['p'].includes(element.tagName.toLowerCase())) {
+            /*  if (['p'].includes(element.tagName.toLowerCase())) {
 
-                    if (element.getAttribute('align') !== null && !element.getAttribute('align').includes('center') &&
-                        element.getAttribute('style') !== null && !element.getAttribute('style').includes('text-indent:')) {
-                        addCheckedStyles(element.id, `Не установлено свойство выравнивания абзаца`);
-
+                  if (element.getAttribute('align') !== null && !element.getAttribute('align').includes('center') &&
+                    element.getAttribute('style') !== null && !element.getAttribute('style').includes('text-indent:')) {
+                        addCheckedStyles(element.id, `Текст, не имеющий выравнивания по центру / не являющийся заголовком, должен иметь абзацный отступ (красная строка). Данный текст имеет выравнивание: ${element.getAttribute('align')}`);
+                       console.log("noalign", window.getComputedStyle(element).textIndent);
                     }
 
                     if (!element.getAttribute('align') &&
                         element.getAttribute('style') !== null && !element.getAttribute('style').includes('text-indent:')) {
                         addCheckedStyles(element.id, `Не установлено свойство выравнивания абзаца`);
-
                     }
 
 
 
-                }
+               } */
 
 
 
@@ -1466,11 +1508,11 @@ toasts-->
                 }
 
                 //pictures indent
-                if (element.getAttribute('style') !== null && element.getAttribute('align')) {
+             /*   if (element.getAttribute('style') !== null && element.getAttribute('align')) {
                     if (element.getAttribute('style').includes('text-indent:') && element.getAttribute('align').includes('center')) {
                         addCheckedStyles(element.id, "Нельзя устанавливать абзацный отступ совместно с выравниванием текста посредине");
                     }
-                }
+                }*/
 
 
 
