@@ -2,6 +2,33 @@
 Author: Kirill Orlov
 """
 
+'''
+This file implements a TextClassifier class for Russian language text classification using pre-trained transformer models. Key features:
+
+1. Model Management:
+   - Supports two pre-trained Russian language models for sequence classification
+   - Handles model initialization with automatic device placement
+   - Includes 4-bit quantization for efficient inference
+
+2. Core Functionality:
+   - Wraps Hugging Face transformers for classification tasks
+   - Provides sentence-level prediction capability
+   - Returns probability distribution over classes
+
+3. Technical Implementation:
+   - Uses AutoTokenizer and AutoModelForSequenceClassification
+   - Implements GPU acceleration with CUDA
+   - Applies softmax to convert logits to probabilities
+   - Includes model-specific configuration parameters
+
+4. Usage:
+   - Default model: 'iproskurina/tda-ruroberta-large-ru-cola'
+   - Instantiated classifier is available as 'model' variable
+   - predict_sentence() method returns class probabilities and top prediction
+
+The class abstracts away model loading and inference details while providing a simple interface for text classification.
+'''
+
 import torch
 from typing import Set, List, Iterator, Tuple
 from transformers import (
