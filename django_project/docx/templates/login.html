@@ -143,6 +143,41 @@
     </div>
 </div>
 
+
+<!-- 
+This HTML file extends a base template and is structured to provide a user-friendly interface for users to gain access to the Lexify application. It includes both CSS for styling and JavaScript for interactive functionality, ensuring a smooth user experience during the login process.
+
+Key Functionalities
+
+1. Custom Scrollbar Styles:
+   - The CSS block defines custom styles for scrollbars, enhancing the visual appearance of the application. It includes styles for both WebKit browsers (like Chrome and Safari) and Firefox, ensuring a consistent look across different platforms.
+
+2. Login Form:
+   - The main feature of this template is the login form. It includes:
+     - An email input field for users to enter their email address.
+     - A hidden password input field that appears after the user submits their email. This field is used for entering a verification code sent to their email.
+     - A button to submit the email and request the verification code, and another button to confirm the code once received.
+
+3. Dynamic Message Display:
+   - A message box is included to display feedback to the user. It can show success or error messages based on user actions, such as incorrect email or successful verification.
+
+4. Loading Indicators:
+   - The buttons for login and verification include a loading spinner that becomes visible when a request is being processed. This provides users with visual feedback that their action is being handled.
+
+5. JavaScript Interactivity:
+   - The JavaScript section contains logic for handling form submissions and managing the state of the application:
+     - The `logSubmit` function sends a request to the server to send a verification code to the provided email address.
+     - The `verifySubmit` function verifies the code entered by the user.
+     - Both functions utilize Axios for making asynchronous requests to the server, handling responses, and updating the UI accordingly.
+     - Event listeners are added to buttons and input fields to facilitate form submission via the Enter key.
+
+6. Error Handling:
+   - The JavaScript includes error handling for failed requests, displaying appropriate messages to the user if something goes wrong during the login or verification process.
+
+7. Local Storage Management:
+   - Upon successful verification, a token is stored in the local storage for maintaining user sessions, allowing for seamless navigation within the application post-login.
+-->
+
 {% endblock %}
 
 
