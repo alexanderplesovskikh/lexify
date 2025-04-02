@@ -2,6 +2,33 @@
 Author: Alexander Plesovskikh
 """
 
+'''
+This file implements a text processing pipeline for document analysis with HTML parsing and sentence tokenization capabilities. Key components:
+
+1. HTML Processing:
+   - Uses BeautifulSoup to parse and clean HTML content
+   - Splits document into main text and references sections
+   - Handles special cases like tables, footnotes and formatting tags
+
+2. Text Segmentation:
+   - Identifies reference sections using predefined keywords
+   - Tokenizes text into paragraphs and sentences
+   - Merges incorrectly split sentences based on punctuation rules
+
+3. Text Cleaning:
+   - Removes URLs and excessive whitespace
+   - Filters out short non-meaningful text fragments
+   - Normalizes text for further processing
+
+4. Key Features:
+   - NLTK-based sentence tokenization with Russian support
+   - Smart handling of nested structures (brackets, quotes)
+   - Special processing for list items and reference sections
+   - Configurable tag filtering (exclude_tags, ref_tags)
+
+The pipeline takes HTML input and produces cleaned, segmented text ready for linguistic analysis and reference processing.
+'''
+
 #imports
 from nltk.tokenize import sent_tokenize
 from bs4 import BeautifulSoup
@@ -155,4 +182,3 @@ def get_clean_sentences(string):
 
 def form_list_of_clean_sents(array):
     return [get_clean_sentences(element) if len(get_clean_sentences(element)) > 10 else '<#excluded#>' for element in array]
-
