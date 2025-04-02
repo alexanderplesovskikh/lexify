@@ -1,3 +1,35 @@
+'''
+This file defines the URL routing configuration for a Django web application with the following endpoints:
+
+1. Core Pages:
+   - Main page ("/")
+   - Document check page ("/check/")
+   - Login page ("/login/")
+   - Profile page ("/profile")
+   - FAQ page ("/faq")
+   - How-to guide ("/howto")
+
+2. Document Processing:
+   - File upload endpoint ("/upload_word_to_server/")
+   - Report generation ("/form_report/")
+   - Report viewing ("/view")
+   - User documents retrieval ("/get_user_docks/")
+   - File download ("/ss4d")
+
+3. Authentication:
+   - Verification code sending ("/send_code/")
+   - Code verification ("/verify_code/")
+
+4. Technical Routes:
+   - Robots.txt ("/robots.txt")
+   - Sitemap ("/sitemap")
+   - Yandex verification file
+   - No-JS fallback page ("/nojs/")
+   - Frame page ("/frame/")
+
+The URL patterns map to corresponding view functions while maintaining named routes for reverse URL lookups.
+'''
+
 from django.urls import path
 
 from .views import get_main_page, get_check_page, UploadDocxView, get_login_page, get_no_js_page, get_frame_page, send_verification_code, verify_code, robots_txt, get_profile, get_yandex, sitemap, get_howto
@@ -26,4 +58,3 @@ urlpatterns = [
 """
 Author: Alexander Plesovskikh
 """
-
