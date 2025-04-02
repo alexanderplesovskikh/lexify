@@ -2,6 +2,33 @@
 Author: Kirill Orlov
 """
 
+'''
+This file implements a text analysis tool for detecting problematic linguistic patterns with the following features:
+
+1. Core Functionality:
+   - Checks text for excluded characters, sequences, and words
+   - Identifies future tense verbs using pymorphy3 morphological analysis
+   - Provides detailed error messages for found issues
+
+2. Pattern Detection:
+   - ExcludedSequence: Finds forbidden character sequences
+   - ExcludedWord: Detects prohibited words with context awareness
+   - Future verb detection through morphological parsing
+
+3. Technical Implementation:
+   - Uses dataclasses for pattern storage and state management
+   - Configurable via JSON input (excluded patterns/rules)
+   - Stateful processing of text character-by-character
+   - Efficient tracking of multiple pattern types simultaneously
+
+4. Output:
+   - Boolean result indicating if errors were found
+   - Detailed human-readable error message listing all detected issues
+   - Clear separation between different error types (chars, sequences, words, verbs)
+
+The class provides a comprehensive solution for automated text quality control with customizable rules.
+'''
+
 import json
 from typing import List, Tuple, Set
 from dataclasses import dataclass
