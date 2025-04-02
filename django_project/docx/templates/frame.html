@@ -120,6 +120,30 @@ body, html {
 
         </div>
 
+
+
+<!-- 
+This HTML file is a Django template designed for a dynamic tabbed interface that includes an iframe for displaying content. 
+
+The main functionalities of this file are:
+
+1. Template Inheritance:
+   - The file extends a base template (base.html), allowing for consistent styling and layout across the application.
+
+2. Static File Loading:
+   - It uses load static to enable the use of static files like CSS and JavaScript, ensuring that the resources are properly linked.
+
+3. CSS Customization:
+   - Custom styles are defined for scrollbars, iframes, tabs, and their contents. This includes styles for active tabs, hover effects, and overall layout adjustments.
+   - The scrollbar is styled for both WebKit browsers and Firefox to enhance the user experience.
+
+4. Dynamic Tab Management:
+   - The page includes a tabbed interface that allows users to switch between different content sections. Users can add new tabs dynamically up to a limit of 23.
+   - Each tab is associated with an iframe that loads a specific URL check, enabling users to view different content without leaving the page.
+
+Overall, this file provides a user-friendly interface for displaying content in a tabbed format, enhancing the interaction with the embedded iframe while maintaining a clean and organized layout.
+-->
+
         
 
 {% endblock %}
