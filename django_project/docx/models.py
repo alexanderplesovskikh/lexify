@@ -2,6 +2,35 @@
 Author: Vlad Golub
 """
 
+'''
+This file defines Django models for a document analysis application with three main models:
+
+1. Paragraph Model:
+   - Stores document content paragraphs with reference flag
+   - Fields: content text, is_reference boolean, timestamp
+   - Database table: 'paragraphs'
+   - Index on is_reference for faster filtering
+
+2. UserToken Model:
+   - Manages user authentication tokens and email verification
+   - Fields: unique email, token string, verification code
+   - Database table: 'docx_usertoken' 
+   - Email field indexed for faster lookups
+
+3. AnalysisLog Model:
+   - Tracks document analysis history and results
+   - Fields: user email, analysis date, file metadata, error counts
+   - Stores report content and recipients as JSON
+   - Database table: 'analysis_log'
+   - Automatic timestamping on creation
+
+Key features:
+- Clean string representations for admin interface
+- Database table names explicitly set
+- Indexes on frequently queried fields
+- Supports both text content and analysis metadata storage
+'''
+
 from django.db import models
 
 class Paragraph(models.Model):
@@ -39,9 +68,6 @@ class AnalysisLog(models.Model):
     file_name = models.TextField(blank=True, null=True)
     file_chars = models.TextField(blank=True, null=True)
     file_time = models.TextField(blank=True, null=True)
-
-    
-
 
     class Meta:
         db_table = 'analysis_log'  
