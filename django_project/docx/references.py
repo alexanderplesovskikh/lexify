@@ -2,6 +2,37 @@
 Author: Tatyana Romanova
 """
 
+'''
+This file implements a comprehensive reference/bibliography processing system with the following capabilities:
+
+1. Reference Pattern Matching:
+   - Supports multiple reference types (journal articles, books, electronic resources)
+   - Handles both Russian and English formats
+   - Uses complex regex patterns for parsing bibliographic data
+   - Includes GOST standard validation
+
+2. Citation Processing:
+   - DOI lookup and metadata extraction via Crossref API
+   - BibTeX conversion and formatting
+   - Supports multiple citation styles (Harvard, GOST, IEEE, MDPI, Elsevier, Springer)
+   - Automatic language detection (Russian/English)
+
+3. Key Features:
+   - Robust error handling with retry mechanism
+   - Predefined examples for each style and language
+   - Reference validation against standards
+   - Format correction and normalization
+   - Structured output with status and messages
+
+4. Technical Implementation:
+   - Uses crossref.restful and habanero for DOI lookups
+   - Leverages bibtexparser and citeproc-py for citation formatting
+   - Includes comprehensive regex patterns for parsing
+   - Provides style examples for comparison
+
+The system validates references, checks compliance with standards, and converts references between different citation formats.
+'''
+
 from crossref.restful import Works
 from habanero import Crossref
 import crossref
@@ -86,6 +117,7 @@ def split_groups(match):
     split_year(match, dictionary)
     filtered = {k: v for k, v in dictionary.items() if (v is not None) and (v != '')}
     return filtered
+
 
 def detect_language(text):
     url_pattern = re.compile(r'https?://\S+|www\.\S+')
