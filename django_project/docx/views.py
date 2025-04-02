@@ -1,3 +1,37 @@
+'''
+This file is a Django views module for the Lexify web application, which performs linguistic acceptability checks on texts. Key functionalities:
+
+1. Page handling:
+   - Static pages (main, FAQ, check, login, etc.)
+   - Technical pages (robots.txt, sitemap.xml)
+
+2. Authentication functions:
+   - Sending/verifying email confirmation codes
+   - Generating user tokens
+
+3. Document processing:
+   - DOCX to HTML conversion using LibreOffice
+   - Removing change tracking from documents
+   - Adding HTML element IDs for subsequent analysis
+
+4. Linguistic analysis:
+   - Rule-based text checking (rules stored in JSON)
+   - Reference and bibliography verification
+   - Using ML model to detect problematic sentences
+
+5. Report generation:
+   - Creating PDF reports with check results
+   - Storing check history
+   - Viewing previously generated reports
+
+6. Utility functions:
+   - Parallel text processing
+   - Temporary file handling
+   - Data streaming
+
+The main UploadDocxView class handles uploaded documents and coordinates the entire verification process.
+'''
+
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.utils.decorators import method_decorator
@@ -413,18 +447,7 @@ def stream2(html_file, is_ml, biblio_style_get):
 
     sentencized_sents = merge_raw_sents(raw_sents)
 
-    cleaned_sents = form_list_of_clean_sents(sentencized_sents)
-
-
-
-    '''result_refs = parallel_process_refs(refs)
-    sorted_refs = sorted(result_refs, key=lambda x: x[0])
-
-    for i in sorted_refs:
-        yield i[1]'''
-
-
-   
+    cleaned_sents = form_list_of_clean_sents(sentencized_sents)   
 
     
     found_all = parallel_process_find(html_file, sentencized_sents)
@@ -500,9 +523,6 @@ def stream2(html_file, is_ml, biblio_style_get):
                 llm_result = model.predict_sentence(text)[0]['Unacceptable']
                 llm_label = 'Возможно, лингвистически неприемлемое предложение c вероятностью (%): '
                 llm_score = np.round(llm_result*100,2)
-            
-            
-                #model2res = model.predict_sentence(text)
             
 
                 if llm_score > 95:
@@ -674,26 +694,7 @@ def form_report(request):
 
         clean_sentences = all_sent_parser
 
-        #correct_sentences_count = int(found_all) - int(found_llm) - int(found_rule)
-        #confidence_correct = 100
-        ##incorrect_sentences_count = int(found_rule) + int(found_llm)
-        #confidence_incorrect = 100
-        #correct_sources_count = 1
-        #confidence_correct_sources = 1
-        #incorrect_sources_count = 1
-        ##confidence_incorrect_sources = 1
         checker_email = email_s
-
-        '''create_report_docx(doc_path, clean_sentences,
-                           correct_sentences_count, confidence_correct,
-                        incorrect_sentences_count, confidence_incorrect,
-                        correct_sources_count, confidence_correct_sources,
-                        incorrect_sources_count, confidence_incorrect_sources,
-                        checker_email, bites_s, name_s, int(float(found_all)))'''
-
-
-       
-
 
         AnalysisLog.objects.create(email=email_s, 
                                    report_text=html_s, 
@@ -703,9 +704,6 @@ def form_report(request):
                                    file_time=time_s,
                                    file_hash=unique_string)
         
-        '''libreoffice_convert_to_pdf(unique_string + '.docx', outdir)'''
-
-
         pattern = r'(<[^>]* data-bs-title="([^"]*)"[^>]*>)'
 
         # Function to replace the match with the content before the corresponding tag
@@ -848,8 +846,6 @@ def get_user_docks(request):
 import re
 
 def view_report(request):
-
-    #Not implemented: disallow to access someone's docuemnts!
 
     log_id = request.GET.get('id')
 
