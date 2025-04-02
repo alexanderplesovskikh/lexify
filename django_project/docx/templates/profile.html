@@ -168,7 +168,35 @@
 </div>
 
 
+<!-- 
+This HTML template is designed for a user profile page within a web application. It integrates various elements for displaying user information, specifically focusing on checked documents. Below is a detailed breakdown of its structure and functionality:
 
+Overview
+
+The template extends a base layout and employs Django's template language to manage static files and block content. It is structured to provide a clean and interactive user profile interface, showcasing verified works and offering users the ability to check new documents.
+
+Key Functionalities
+
+1. Custom Scrollbar Styles:
+   - The CSS section includes custom scrollbar styles for both WebKit browsers and Firefox, enhancing the visual experience. The scrollbar is designed to be thin with rounded corners, providing a modern aesthetic.
+
+2. Tabs for Verified Works:
+   - The template features two main sections for displaying checked documents:
+     - No Verified Documents: When the user has no checked documents, a message is displayed, prompting them to check a document with a call-to-action button.
+     - Verified Documents: If documents exist, this section will display them dynamically, allowing users to view their checked works.
+
+3. Dynamic Content Loading:
+   - The JavaScript section includes a function (getChecked) that fetches the user's checked documents from the server using a POST request. This function utilizes the Fetch API to handle the request asynchronously, ensuring a smooth user experience without page reloads.
+
+4. Local Storage Management:
+   - The script checks if a user is logged in by verifying the presence of a token in local storage. If the token is absent, the user is redirected to the login page, ensuring that only authenticated users can access the profile section.
+
+5. Error Handling:
+   - The script includes basic error handling for the fetch request, logging responses to the console for debugging. This can be expanded to provide user feedback in case of errors.
+
+6. Conditional Display Logic:
+   - Based on the server response, the script determines whether to show the "no works" message or the section containing verified works. This dynamic display enhances user engagement by providing relevant information based on their actions.
+-->
 
 
 {% endblock %}
